@@ -3,6 +3,7 @@ package com.jet.learnq.controller;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.EditText;
@@ -53,12 +54,14 @@ public class OptionsActivity extends AppCompatActivity {
         changeThemeButton = findViewById(R.id.options_activity_change_theme_button);
         pasteArrayEditText = findViewById(R.id.options_activity_editText_array);
         pasteArrayEditText.setOnKeyListener((v, keycode, event) -> {
-            if (keycode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+            if (keycode == KeyEvent.KEYCODE_SPACE && event.getAction() == KeyEvent.ACTION_UP) {
                 String str = pasteArrayEditText.getText().toString();
                 List<PairDTO> pairs = converter.getWordDTOsFromStringArray(
                         Arrays.stream(str.split("\n")).collect(Collectors.toList()));
                 for (PairDTO pairDTO : pairs) {
                     for (String string : pairDTO.getTranslations()) {
+                        Log.println(Log.INFO, "msg", pairDTO.getWord());
+                        Log.println(Log.INFO, "msg", string);
                         dictionary.addANewPair(pairDTO.getWord(), string);
                     }
                 }

@@ -63,12 +63,12 @@
             app:layout_constraintHorizontal_bias="0.506"/>
     <EditText
             android:background="@android:color/transparent"
+            android:inputType="textMultiLine"
             android:textSize="20sp"
             android:textColorHint="@color/edit_text_color"
             android:textColor="@color/writable_text_color"
             android:layout_width="210dp"
             android:layout_height="52dp"
-            android:inputType="textPersonName"
             android:hint="@string/paste_here"
             android:fontFamily="@font/roboto_flex_regular"
             android:id="@+id/options_activity_editText_array"

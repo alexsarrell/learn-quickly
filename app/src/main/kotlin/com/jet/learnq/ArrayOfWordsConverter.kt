@@ -24,15 +24,18 @@ class ArrayOfWordsConverter {
         for (str in stringArray) {
             val sb = StringBuilder()
             val translations = kotlin.collections.ArrayList<String>()
-            for (i in 0..str.length) {
+            for (i in str.indices) {
                 if (str[i] != '-') {
                     sb.append(str[i])
                 } else {
                     var transBuilder = StringBuilder()
-                    for (j in i..str.length) {
-                        if (str[i] != ',') {
-                            transBuilder.append(str[i])
+                    for (j in i + 1 until str.length) {
+                        if (str[j] != ',' && j != str.length - 1) {
+                            transBuilder.append(str[j])
                         } else {
+                            if (j == str.length - 1) {
+                                transBuilder.append(str[j])
+                            }
                             translations.add(transBuilder.toString().trim())
                             transBuilder = StringBuilder()
                         }
