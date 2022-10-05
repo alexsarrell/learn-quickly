@@ -88,6 +88,17 @@
             android:layout_marginBottom="32dp" app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_bias="1.0" android:layout_marginEnd="32dp"
             app:layout_constraintTop_toBottomOf="@+id/options_activity_add_an_array"/>
+    <ImageButton
+            android:layout_width="65dp"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck"
+            android:scaleType="fitStart"
+            android:layout_height="65dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_line_button" android:id="@+id/options_activity_add_an_array_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="32dp" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.053" android:layout_marginEnd="172dp"
+            app:layout_constraintTop_toBottomOf="@+id/options_activity_add_an_array"/>
     <TextView
             android:ems="10"
             android:text=""
