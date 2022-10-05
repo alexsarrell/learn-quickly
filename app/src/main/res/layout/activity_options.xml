@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   tools:context="com.jet.learnq.controller.OptionsActivity"
+                                                   android:background="@color/main_background">
+
+    <ImageButton
+            android:layout_width="230dp"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck"
+            android:scaleType="fitStart"
+            android:layout_height="50dp"
+            android:background="@android:color/transparent"
+
+            app:srcCompat="@drawable/ic_language_selection"
+            android:id="@+id/options_activity_language2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.503"
+
+            app:layout_constraintTop_toBottomOf="@+id/options_activity_language1" android:layout_marginTop="12dp"/>
+    <ImageButton
+            android:scaleType="fitStart"
+            android:background="@android:color/transparent"
+            android:layout_width="230dp"
+            android:layout_height="50dp" app:srcCompat="@drawable/ic_language_selection"
+            android:id="@+id/options_activity_language1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/choose_language_textview" android:layout_marginTop="12dp"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+            android:text="@string/add_array_text_view"
+            android:fontFamily="@font/roboto_flex_regular"
+            android:textColor="@color/text_labels_color"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/add_an_array_textview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/options_activity_language2" android:layout_marginTop="60dp"
+    />
+    <TextView
+            android:text="@string/language_pair_text_view"
+            android:fontFamily="@font/roboto_flex_regular"
+            android:textSize="20sp"
+            android:textColor="@color/text_labels_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/choose_language_textview"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="84dp" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.503"/>
+    <ImageView
+            android:layout_width="230dp"
+            android:layout_height="65dp" app:srcCompat="@drawable/ic_paste_here"
+            android:textColorHint="@color/edit_text_color"
+            android:id="@+id/options_activity_add_an_array"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/add_an_array_textview"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.506"/>
+    <EditText
+            android:background="@android:color/transparent"
+            android:textSize="20sp"
+            android:textColorHint="@color/edit_text_color"
+            android:textColor="@color/writable_text_color"
+            android:layout_width="210dp"
+            android:layout_height="52dp"
+            android:inputType="textPersonName"
+            android:hint="@string/paste_here"
+            android:fontFamily="@font/roboto_flex_regular"
+            android:id="@+id/options_activity_editText_array"
+            app:layout_constraintTop_toTopOf="@+id/options_activity_add_an_array"
+            app:layout_constraintBottom_toBottomOf="@+id/options_activity_add_an_array"
+            app:layout_constraintStart_toStartOf="@+id/options_activity_add_an_array"
+            app:layout_constraintEnd_toEndOf="@+id/options_activity_add_an_array"/>
+
+    <ImageButton
+            android:layout_width="65dp"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck"
+            android:scaleType="fitStart"
+            android:layout_height="65dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_night_theme_button" android:id="@+id/options_activity_change_theme_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="32dp" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="1.0" android:layout_marginEnd="32dp"
+            app:layout_constraintTop_toBottomOf="@+id/options_activity_add_an_array"/>
+    <TextView
+            android:ems="10"
+            android:text=""
+            android:fontFamily="@font/roboto_flex_regular"
+            android:textColor="@color/edit_text_color"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/options_activity_text_view_language1"
+            app:layout_constraintStart_toStartOf="@+id/options_activity_language1" android:layout_marginStart="10dp"
+            app:layout_constraintTop_toTopOf="@+id/options_activity_language1" android:layout_marginTop="8dp"/>
+    <TextView
+            android:text=""
+            android:ems="10"
+            android:fontFamily="@font/roboto_flex_regular"
+            android:textSize="20sp"
+            android:textColor="@color/edit_text_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/options_activity_text_view_language2"
+            app:layout_constraintTop_toTopOf="@+id/options_activity_language2"
+            app:layout_constraintStart_toStartOf="@+id/options_activity_language2" android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

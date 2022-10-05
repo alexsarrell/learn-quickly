@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">LearnQ</string>
+    <string name="title_translation">Translation</string>
+    <string name="title_word">Word</string>
+    <string name="search_hint">Search</string>
+    <string name="database_name">dictionaries.db</string>
+    <string name="version_number">2</string>
+    <string name="paste_here">Paste here</string>
+    <string name="main_activity_preference_file_dictionary">shared_pref_dictionary</string>
+    <string name="language_pair_text_view">Choose a language pair</string>
+    <string name="add_array_text_view">Add an array of words</string>
+    <string name="alphabet">a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z</string>
+    <string name="search_message">What do you want to do?</string>
+    <string name="delete_button">Delete</string>
+    <string name="apply_button">Apply</string>
+    <string name="cansel_button">Cansel</string>
+    <string name="edit_button">Edit</string>
+</resources>
