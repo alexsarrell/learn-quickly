@@ -57,6 +57,9 @@ public class SearchActivity extends AppCompatActivity {
         extra = getIntent().getExtras();
         preferences = getSharedPreferences("Properties", MODE_PRIVATE);
         scrollViewBuilder = new ScrollViewBuilder(getApplicationContext());
+
+        converter = new ArrayOfWordsConverter();
+
         dictionary = new Dictionary(
                 new SQLiteDatabaseController(SearchActivity.this), SearchActivity.this);
 
@@ -85,7 +88,6 @@ public class SearchActivity extends AppCompatActivity {
             typeface = getResources().getFont(R.font.open_sans_medium_italic);
             addTouchListener(sortedWords);
             fillItemsInList(sortedWords, languagesList, typeface);
-            converter = new ArrayOfWordsConverter();
         }
     }
 
@@ -117,8 +119,8 @@ public class SearchActivity extends AppCompatActivity {
             sortedWords = new ArrayList<>();
             sortedTranslations = new ArrayList<>();
 
-            fillPairs(pairs, sortedWords);
-            fillPairs(pairsTranslations, sortedTranslations);
+            converter.fillPairs(pairs, sortedWords);
+            converter.fillPairs(pairsTranslations, sortedTranslations);
             sortedWords = sortedWords.stream().sorted().collect(Collectors.toList());
             sortedTranslations = sortedTranslations.stream().sorted().collect(Collectors.toList());
         } else {
@@ -126,28 +128,7 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    private void fillPairs(List<WordDTO> items, List<String> stringItem) {
-        stringItem.clear();
-        for (WordDTO wd : items) {
-            boolean contains = false;
-            for (String s : stringItem) {
-                contains = s.toLowerCase().startsWith(wd.getName().toLowerCase());
-                if (contains) {
-                    break;
-                }
-            }
-            if (!contains) {
-                StringBuilder stringBuilder = new StringBuilder(wd.getName() + " - " +
-                        wd.getTranslations().get(0).getName());
-                if (wd.getTranslations().size() > 1) {
-                    for (int i = 1; i < wd.getTranslations().size(); i++) {
-                        stringBuilder.append(", ").append(wd.getTranslations().get(i).getName());
-                    }
-                }
-                stringItem.add(stringBuilder.toString());
-            }
-        }
-    }
+
 
     private <T extends String> void addTouchListener(List<T> models) {
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -244,30 +225,7 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    /*private WordDTO getDTOsFromString(String text, List<WordDTO> pairs){
-        StringBuilder sb = new StringBuilder();
-        Iterator<Integer> iterator = text.chars().iterator();
-        while(iterator.hasNext()){
-            char ch = (char)(int)iterator.next();
-            if(ch != '-'){
-                sb.append((char)(int)ch);
-            }
-            else{
-                sb.deleteCharAt(sb.length() - 1);
-                break;
-            }
-        }
-        Log.println(Log.INFO, "message", "what word " +
-                sb);
-        WordDTO wordToDelete = pairs.get(0);
-        for(WordDTO wd : pairs){
-            if(wd.getName().equals(sb.toString())){
-                wordToDelete = wd;
-                break;
-            }
-        }
-        return wordToDelete;
-    }*/
+
     private void addTextViewOnClickListener(TextView textView) {
         textView.setOnClickListener(view -> {
             mirrorPairs();
@@ -332,3 +290,49 @@ public class SearchActivity extends AppCompatActivity {
         return super.dispatchTouchEvent(motionEvent);
     }
 }
+  /*private void fillPairs(List<WordDTO> items, List<String> stringItem) {
+        stringItem.clear();
+        for (WordDTO wd : items) {
+            boolean contains = false;
+            for (String s : stringItem) {
+                contains = s.toLowerCase().startsWith(wd.getName().toLowerCase());
+                if (contains) {
+                    break;
+                }
+            }
+            if (!contains) {
+                StringBuilder stringBuilder = new StringBuilder(wd.getName() + " - " +
+                        wd.getTranslations().get(0).getName());
+                if (wd.getTranslations().size() > 1) {
+                    for (int i = 1; i < wd.getTranslations().size(); i++) {
+                        stringBuilder.append(", ").append(wd.getTranslations().get(i).getName());
+                    }
+                }
+                stringItem.add(stringBuilder.toString());
+            }
+        }
+    }*/
+ /*private WordDTO getDTOsFromString(String text, List<WordDTO> pairs){
+        StringBuilder sb = new StringBuilder();
+        Iterator<Integer> iterator = text.chars().iterator();
+        while(iterator.hasNext()){
+            char ch = (char)(int)iterator.next();
+            if(ch != '-'){
+                sb.append((char)(int)ch);
+            }
+            else{
+                sb.deleteCharAt(sb.length() - 1);
+                break;
+            }
+        }
+        Log.println(Log.INFO, "message", "what word " +
+                sb);
+        WordDTO wordToDelete = pairs.get(0);
+        for(WordDTO wd : pairs){
+            if(wd.getName().equals(sb.toString())){
+                wordToDelete = wd;
+                break;
+            }
+        }
+        return wordToDelete;
+    }*/
