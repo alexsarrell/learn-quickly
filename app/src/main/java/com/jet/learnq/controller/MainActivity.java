@@ -136,13 +136,13 @@ public class MainActivity extends AppCompatActivity {
                 x2 = touch.getX();
                 y2 = touch.getY();
                 if (y2 - y1
-                        > (int) (getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)
+                        > ((float) getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)
                         && Math.abs(x1 - x2)
                         < ((float) getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)) {
                     startActivity(options);
                     overridePendingTransition(R.anim.slide_on_top, R.anim.slide_out_top);
                 }
-                if (x2 - x1 > (int) (getApplicationContext().getResources().getDisplayMetrics().widthPixels / 10)
+                if (x2 - x1 > ((float) getApplicationContext().getResources().getDisplayMetrics().widthPixels / 10)
                         && Math.abs(y1 - y2)
                         < ((float) getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)) {
                     search.putExtra("lanOrPairs", true);

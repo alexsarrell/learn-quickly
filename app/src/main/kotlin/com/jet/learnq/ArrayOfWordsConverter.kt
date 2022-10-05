@@ -1,9 +1,10 @@
 package com.jet.learnq
 
 import com.jet.learnq.dto.WordDTO
-import com.jet.learnq.model.Dictionary
+import com.jet.learnq.model.PairDTO
+import java.util.*
 
-class ArrayOfWordsConverter() {
+class ArrayOfWordsConverter {
     fun getDTOsFromString(text: String, pairs: List<WordDTO>): WordDTO {
         val sb = convertStringToWordDTO(text)
         var wordToDelete: WordDTO = pairs[0]
@@ -14,6 +15,34 @@ class ArrayOfWordsConverter() {
             }
         }
         return wordToDelete
+    }
+
+    fun getWordDTOsFromStringArray(
+        stringArray: List<String>
+    ): List<PairDTO> {
+        val pairs = kotlin.collections.ArrayList<PairDTO>()
+        for (str in stringArray) {
+            val sb = StringBuilder()
+            val translations = kotlin.collections.ArrayList<String>()
+            for (i in 0..str.length) {
+                if (str[i] != '-') {
+                    sb.append(str[i])
+                } else {
+                    var transBuilder = StringBuilder()
+                    for (j in i..str.length) {
+                        if (str[i] != ',') {
+                            transBuilder.append(str[i])
+                        } else {
+                            translations.add(transBuilder.toString().trim())
+                            transBuilder = StringBuilder()
+                        }
+                    }
+                    break
+                }
+            }
+            pairs.add(PairDTO(sb.toString().trim(), translations))
+        }
+        return pairs
     }
 
     private fun convertStringToWordDTO(text: String): StringBuilder {
@@ -31,10 +60,28 @@ class ArrayOfWordsConverter() {
         return sb
     }
 
-    fun addAnArrayOfFords(array: List<String>, dictionary: Dictionary) {
-        val dtoArray: List<WordDTO> = ArrayList()
-        for (string in array) {
-            getDTOsFromString(string, dtoArray)
+    fun fillPairs(items: List<WordDTO>, stringItem: MutableList<String>) {
+        stringItem.clear()
+        for (wd: WordDTO in items) {
+            var contains = false
+            for (s: String in stringItem) {
+                contains = s.lowercase(Locale.getDefault()).startsWith(wd.name.lowercase(Locale.getDefault()))
+                if (contains) {
+                    break
+                }
+            }
+            if (!contains) {
+                val stringBuilder = java.lang.StringBuilder(
+                    wd.name + " - " +
+                            wd.translations[0].name
+                )
+                if (wd.translations.size > 1) {
+                    for (i in 1 until wd.translations.size) {
+                        stringBuilder.append(", ").append(wd.translations[i].name)
+                    }
+                }
+                stringItem.add(stringBuilder.toString())
+            }
         }
     }
 }
