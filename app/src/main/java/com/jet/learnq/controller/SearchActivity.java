@@ -218,7 +218,7 @@ public class SearchActivity extends AppCompatActivity {
             item.setGravity(Gravity.CENTER_VERTICAL);
             if (!isDictionary) {
                 item.setOnClickListener(view -> {
-                    String chosenLanguage = item.getText().toString();
+                    String chosenLanguage = item.getText().toString().trim();
                     SharedPreferences.Editor editor = preferences.edit();
                     if (!firstOrSecondLanguage) editor.putString("default_language_on", chosenLanguage);
                     else editor.putString("default_language_to", chosenLanguage);
