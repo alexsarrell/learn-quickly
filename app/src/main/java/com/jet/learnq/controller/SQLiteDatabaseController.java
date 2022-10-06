@@ -14,6 +14,7 @@ import com.jet.learnq.model.WordModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SQLiteDatabaseController extends SQLiteOpenHelper {
     public static final String LANGUAGE_ID = "LANGUAGE_ID";
@@ -27,8 +28,9 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
     public static final String WORD_TRANSLATION_TABLE = "WORD_TRANSLATION_TABLE";
 
     public SQLiteDatabaseController(@Nullable @org.jetbrains.annotations.Nullable Context context) {
-        super(context, context.getString(R.string.database_name), null, Integer.parseInt(
-                context.getString(R.string.version_number)));
+        super(context, Objects.requireNonNull(context).getString(R.string.database_name),
+                null, Integer.parseInt(
+                        context.getString(R.string.version_number)));
     }
 
     @Override
@@ -160,7 +162,7 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
         }
     }
 
-    private WordModel findModelInList(List<WordModel> words, int id, int languageId, String word) {
+    private WordModel findModelInList(List<WordModel> words, int id/*, int languageId, String word*/) {
 
         for (WordModel wm : words) {
             if (wm.getWord_id() == id) {
@@ -176,26 +178,16 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
                 do {
                     if (cursor.getInt(0) == words.get(i).getWord_id()) {
                         words.get(i).addTranslation(findModelInList(translations,
-                                cursor.getInt(3),
+                                cursor.getInt(3)/*,
                                 cursor.getInt(5),
-                                cursor.getString(4)));
-                        /*words.get(i).addTranslation(new WordModel(
-                                cursor.getInt(3),
-                                cursor.getInt(5),
-                                cursor.getString(4),
-                                new ArrayList<>()));*/
+                                cursor.getString(4)*/));
                     }
                     if (cursor.getInt(3) == translations.get(i).getWord_id()) {
                         translations.get(i).addTranslation(findModelInList(
                                 words,
-                                cursor.getInt(0),
+                                cursor.getInt(0)/*,
                                 cursor.getInt(2),
-                                cursor.getString(1)));
-                        /*translations.get(i).addTranslation(new WordModel(
-                                cursor.getInt(0),
-                                cursor.getInt(2),
-                                cursor.getString(1),
-                                new ArrayList<>()));*/
+                                cursor.getString(1)*/));
                     }
                 } while (cursor.moveToNext());
             }
@@ -213,24 +205,22 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
                 String LangName = cursor.getString(1);
                 returnList.add(new LanguageModel(LangId, LangName));
             } while (cursor.moveToNext());
-        } else {
-            //failure. do not add anything to the list
         }
         cursor.close();
         db.close();
         return returnList;
     }
 
-    private boolean hasSimilar(WordModel wordModel, String COLUMN, String TABLE_NAME) {
+    private boolean hasSimilar(WordModel wordModel, /*String COLUMN,*/ String TABLE_NAME) {
         SQLiteDatabase database = SQLiteDatabaseController.this.getReadableDatabase();
-        String queryWordString = "SELECT " + COLUMN + ", " + LANGUAGE_ID + " FROM " + TABLE_NAME;
+        String queryWordString = "SELECT " + WORD_TEXT + ", " + LANGUAGE_ID + " FROM " + TABLE_NAME;
         Cursor cursor = database.rawQuery(queryWordString, null);
         if (cursor.moveToFirst()) {
             do {
                 String name = cursor.getString(0);
                 int languageId = cursor.getInt(1);
-                return name.equalsIgnoreCase(wordModel.getName())
-                        & languageId == wordModel.getLanguage_id();
+                if (name.equalsIgnoreCase(wordModel.getName())
+                        & languageId == wordModel.getLanguage_id()) return true;
             } while (cursor.moveToNext());
         }
         database.close();
@@ -238,8 +228,8 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
     }
 
     public boolean addOnePair(WordModel word, WordModel translation) {
-        if (hasSimilar(word, WORD_TEXT, WORD_TABLE)) {
-            if (hasSimilar(translation, WORD_TEXT, TRANSLATION_TABLE)) {
+        if (hasSimilar(word, /*WORD_TEXT, */WORD_TABLE)) {
+            if (hasSimilar(translation, /*WORD_TEXT, */TRANSLATION_TABLE)) {
                 if (linkContainsRow(word, translation)) {
                     return false;
                 } else {
@@ -249,8 +239,8 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
                 return insertTranslation(translation) != -1 &&
                         insertPair(word, translation) != -1;
             }
-        } else if (hasSimilar(word, WORD_TEXT, TRANSLATION_TABLE)) {
-            if (hasSimilar(translation, WORD_TEXT, WORD_TABLE)) {
+        } else if (hasSimilar(word, /*WORD_TEXT, */TRANSLATION_TABLE)) {
+            if (hasSimilar(translation, /*WORD_TEXT, */WORD_TABLE)) {
                 if (linkContainsRow(translation, word)) {
                     return false;
                 } else {
@@ -259,12 +249,12 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
             } else {
                 return insertWord(translation) != -1 && insertPair(translation, word) != -1;
             }
-        } else if (!hasSimilar(word, WORD_TEXT, WORD_TABLE)
-                && !hasSimilar(word, WORD_TEXT, TRANSLATION_TABLE)) {
-            if (hasSimilar(translation, WORD_TEXT, WORD_TABLE)) {
+        } else if (!hasSimilar(word, /*WORD_TEXT, */WORD_TABLE)
+                && !hasSimilar(word, /*WORD_TEXT, */TRANSLATION_TABLE)) {
+            if (hasSimilar(translation,/* WORD_TEXT, */WORD_TABLE)) {
                 return insertTranslation(word) != -1 &&
                         insertPair(translation, word) != -1;
-            } else if (hasSimilar(translation, WORD_TEXT, TRANSLATION_TABLE)) {
+            } else if (hasSimilar(translation, /*WORD_TEXT, */TRANSLATION_TABLE)) {
                 return insertWord(word) != -1 &&
                         insertPair(word, translation) != -1;
             } else {
@@ -277,15 +267,15 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
     }
 
     private boolean linkContainsRow(WordModel word, WordModel translation) {
-        String query = "SELECT * FROM wtt " + WORD_TRANSLATION_TABLE +
-                " LEFT JOIN t1 " + WORD_TABLE + " ON wtt." + WORD_ID +
-                " = t1." + WORD_ID + " LEFT JOIN t2" + TRANSLATION_TABLE +
-                " ON WTT." + TRANSLATION_ID + " = T2." + TRANSLATION_ID +
-                " WHERE T1.WORD_TEXT=" + word.getName() +
-                " AND " + " T2.WORD_TEXT=" + translation.getName();
+        String query = "SELECT * FROM " + WORD_TRANSLATION_TABLE +
+                " as wtt LEFT JOIN " + WORD_TABLE + " as t1 ON wtt." + WORD_ID +
+                " = t1." + WORD_ID + " LEFT JOIN " + TRANSLATION_TABLE +
+                " as t2 ON WTT." + TRANSLATION_ID + " = T2." + TRANSLATION_ID +
+                " WHERE T1.WORD_TEXT=\"" + word.getName() +
+                "\" AND " + " T2.WORD_TEXT=\"" + translation.getName() + "\"";
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.rawQuery(query, null);
-        return cursor.getColumnCount() == 0;
+        return cursor.getColumnCount() != 0;
     }
 
     private long insertPair(WordModel wordModel, WordModel translationModel) {
@@ -309,8 +299,7 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
     private int getId(String query, SQLiteDatabase database) {
         Cursor cursor = database.rawQuery(query, null);
         if (cursor.moveToFirst()) {
-            int i = cursor.getInt(0);
-            return i;
+            return cursor.getInt(0);
         }
         cursor.close();
         return -1;
@@ -386,15 +375,6 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
                 }
             } while (cursor.moveToNext());
         }
-    }
-
-    private boolean hasAnotherLinks(Cursor cursor, WordDTO wordDTO) {
-        if (cursor.moveToFirst()) {
-            do {
-
-            } while (cursor.moveToNext());
-        }
-        return false;
     }
 
     @Override

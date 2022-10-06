@@ -10,21 +10,36 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import com.example.learnq1.R;
+import com.jet.learnq.ArrayOfWordsConverter;
+import com.jet.learnq.CoroutineRecord;
+import com.jet.learnq.model.Dictionary;
+import com.jet.learnq.model.PairDTO;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class OptionsActivity extends AppCompatActivity {
     TextView textViewLanguage1;
     TextView textViewLanguage2;
     ImageButton buttonLanguage1;
     ImageButton buttonLanguage2;
+    ImageButton arrayButton;
     ImageButton changeThemeButton;
     EditText pasteArrayEditText;
     SharedPreferences sharedPreferences;
+    ArrayOfWordsConverter converter;
+    Dictionary dictionary;
     float x1, x2, y1, y2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
+
+        dictionary = new Dictionary(
+                new SQLiteDatabaseController(OptionsActivity.this), OptionsActivity.this);
+        converter = new ArrayOfWordsConverter();
 
         sharedPreferences = getApplicationContext().getSharedPreferences("current_theme", MODE_PRIVATE);
         textViewLanguage1 = findViewById(R.id.options_activity_text_view_language1);
@@ -37,18 +52,26 @@ public class OptionsActivity extends AppCompatActivity {
         buttonLanguage1 = findViewById(R.id.options_activity_language1);
         buttonLanguage2 = findViewById(R.id.options_activity_language2);
         changeThemeButton = findViewById(R.id.options_activity_change_theme_button);
+        arrayButton = findViewById(R.id.options_activity_add_an_array_button);
+
         pasteArrayEditText = findViewById(R.id.options_activity_editText_array);
+        arrayButton.setOnClickListener(click -> {
+            String str = pasteArrayEditText.getText().toString();
+            List<PairDTO> pairs = converter.getWordDTOsFromStringArray(
+                    Arrays.stream(str.split("\n")).collect(Collectors.toList()));
+            CoroutineRecord coroutineRecord = new CoroutineRecord();
+            coroutineRecord.addAllPairs(pairs, dictionary);
+            pasteArrayEditText.getText().clear();
+        });
         buttonLanguage1.setOnClickListener(view -> {
             Intent i = new Intent(OptionsActivity.this, SearchActivity.class);
             i.putExtra("language", false);
             startActivity(i);
-            //Toast.makeText(getApplicationContext(), "click", Toast.LENGTH_SHORT).show();
         });
         buttonLanguage2.setOnClickListener(view -> {
             Intent i = new Intent(OptionsActivity.this, SearchActivity.class);
             i.putExtra("language", true);
             startActivity(i);
-            //Toast.makeText(getApplicationContext(), "click", Toast.LENGTH_SHORT).show();
         });
         changeThemeButton.setOnClickListener(view -> {
             if (("Light").equals(sharedPreferences.getString("current_theme", "Light"))) {
@@ -63,7 +86,7 @@ public class OptionsActivity extends AppCompatActivity {
                 editor.apply();
             }
         });
-    } //думаю теперь стоит заняться вытяжкой current языка из базы данных и его настройкой через две кнопки
+    }
 
     public boolean onTouchEvent(MotionEvent touch) {
         switch (touch.getAction()) {
@@ -74,8 +97,7 @@ public class OptionsActivity extends AppCompatActivity {
             case MotionEvent.ACTION_UP:
                 x2 = touch.getX();
                 y2 = touch.getY();
-                if (y1 - y2 > (int) (getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)) {
-                    //сделать настройку чувствительности к жестам
+                if (y1 - y2 > ((float) (getApplicationContext().getResources().getDisplayMetrics().heightPixels) / 10)) {
                     Intent i = new Intent(OptionsActivity.this, MainActivity.class);
                     startActivity(i);
                     overridePendingTransition(R.anim.slide_on_bottom, R.anim.slide_out_bottom);

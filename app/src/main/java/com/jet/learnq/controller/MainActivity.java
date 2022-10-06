@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import com.example.learnq1.R;
+import com.jet.learnq.StringsValidator;
 import com.jet.learnq.model.Dictionary;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,11 +36,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO UNIQUE CONSTRAINT FAILED
         search = new Intent(MainActivity.this, SearchActivity.class);
         options = new Intent(MainActivity.this, OptionsActivity.class);
         SharedPreferences sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE);
-        //getApplicationContext().deleteDatabase("dictionaries.db");
+        getApplicationContext().deleteDatabase("dictionaries.db");
         if (("Light").equals(sharedPreferences.getString("current_theme", "Light"))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         updateCurrentLanguages();
         addTextViewOnClickListener(currentLanguages);
         addTheNewCouple.setOnClickListener(view -> {
+            StringsValidator sv = new StringsValidator(getApplicationContext());
             Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.center_rotate);
             addTheNewCouple.startAnimation(rotation);
             String word = editTextWord.getText().toString();
@@ -59,9 +60,14 @@ public class MainActivity extends AppCompatActivity {
                 if (!word.isEmpty() && !translation.isEmpty()) {
                     if (!word.replaceAll("\\s", "").isEmpty()
                             && !translation.replaceAll("\\s", "").isEmpty()) {
-                        dictionary.addANewPair(word, translation);
-                        Toast.makeText(getApplicationContext(), "The pair is successfully saved",
-                                Toast.LENGTH_SHORT).show();
+                        if (sv.catchForbiddenString(word) && sv.catchForbiddenString(translation)) {
+                            dictionary.addANewPair(word, translation);
+                            Toast.makeText(getApplicationContext(), "The pair is successfully saved",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "You used a forbidden symbol or the word is too long",
+                                    Toast.LENGTH_LONG).show();
+                        }
                         editTextWord.setText("");
                         editTextTranslation.setText("");
                     } else {
@@ -101,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
     private void addTextViewOnClickListener(TextView textView) {
 
         textView.setOnClickListener(view -> {
-            if (currentLanguageOn.equals("empty")
-                    && currentLanguageTo.equals("empty")) {
+            if (currentLanguageOn.equals("Choose a language")
+                    && currentLanguageTo.equals("Choose a language")) {
                 options.putExtra("lanOrPairs", true);
                 startActivity(options);
             } else {
@@ -136,13 +142,13 @@ public class MainActivity extends AppCompatActivity {
                 x2 = touch.getX();
                 y2 = touch.getY();
                 if (y2 - y1
-                        > (int) (getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)
+                        > ((float) getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)
                         && Math.abs(x1 - x2)
                         < ((float) getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)) {
                     startActivity(options);
                     overridePendingTransition(R.anim.slide_on_top, R.anim.slide_out_top);
                 }
-                if (x2 - x1 > (int) (getApplicationContext().getResources().getDisplayMetrics().widthPixels / 10)
+                if (x2 - x1 > ((float) getApplicationContext().getResources().getDisplayMetrics().widthPixels / 10)
                         && Math.abs(y1 - y2)
                         < ((float) getApplicationContext().getResources().getDisplayMetrics().heightPixels / 10)) {
                     search.putExtra("lanOrPairs", true);
