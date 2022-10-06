@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         search = new Intent(MainActivity.this, SearchActivity.class);
         options = new Intent(MainActivity.this, OptionsActivity.class);
         SharedPreferences sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE);
-        //getApplicationContext().deleteDatabase("dictionaries.db");
+        getApplicationContext().deleteDatabase("dictionaries.db");
         if (("Light").equals(sharedPreferences.getString("current_theme", "Light"))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
