@@ -34,9 +34,6 @@ public class Dictionary implements Serializable {
         reloadDictionary();
     }
 
-    public boolean editSet(List<WordModel> changed) {
-        return true;
-    }
 
     public void deleteFromDatabase(WordDTO toDeleteDTO,
                                    String languageOn,

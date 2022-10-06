@@ -84,7 +84,6 @@ public class SearchActivity extends AppCompatActivity {
         updateCurrentLanguages();
         getDictionaries();
         if (sortedWords != null && !sortedWords.isEmpty()) {
-            //addTouchListener(sortedWords);
             typeface = getResources().getFont(R.font.open_sans_medium_italic);
             addTouchListener(sortedWords);
             fillItemsInList(sortedWords, languagesList, typeface);
@@ -176,7 +175,6 @@ public class SearchActivity extends AppCompatActivity {
         scrollViewBuilder.strokeDiv(languagesList, (R.drawable.ic_line_divider),
                 0, 0, 200, -40);
         for (T lm : languageModels) {
-
             if (firstLetter != lm.charAt(0)) {
                 firstLetter = lm.charAt(0);
                 scrollViewBuilder.strokeDiv(languagesList, (R.drawable.small_divider));
@@ -199,7 +197,7 @@ public class SearchActivity extends AppCompatActivity {
             item.setGravity(Gravity.CENTER_VERTICAL);
             if (!isDictionary) {
                 item.setOnClickListener(view -> {
-                    String chosenLanguage = item.getText().toString();
+                    String chosenLanguage = item.getText().toString().trim();
                     SharedPreferences.Editor editor = preferences.edit();
                     if (!firstOrSecondLanguage) editor.putString("default_language_on", chosenLanguage);
                     else editor.putString("default_language_to", chosenLanguage);
@@ -239,6 +237,7 @@ public class SearchActivity extends AppCompatActivity {
         editor.putString("default_language_on", preferences.getString("default_language_to", "Error"));
         editor.putString("default_language_to", languageOn);
         editor.apply();
+
         searchPreferences = getSharedPreferences("Pairs_properties", MODE_PRIVATE);
         editor = searchPreferences.edit();
         if (searchPreferences.getString("search_state", "Error").equals("original")) {

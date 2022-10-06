@@ -267,15 +267,15 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
     }
 
     private boolean linkContainsRow(WordModel word, WordModel translation) {
-        String query = "SELECT * FROM wtt " + WORD_TRANSLATION_TABLE +
-                " LEFT JOIN t1 " + WORD_TABLE + " ON wtt." + WORD_ID +
-                " = t1." + WORD_ID + " LEFT JOIN t2" + TRANSLATION_TABLE +
-                " ON WTT." + TRANSLATION_ID + " = T2." + TRANSLATION_ID +
-                " WHERE T1.WORD_TEXT=" + word.getName() +
-                " AND " + " T2.WORD_TEXT=" + translation.getName();
+        String query = "SELECT * FROM " + WORD_TRANSLATION_TABLE +
+                " as wtt LEFT JOIN " + WORD_TABLE + " as t1 ON wtt." + WORD_ID +
+                " = t1." + WORD_ID + " LEFT JOIN " + TRANSLATION_TABLE +
+                " as t2 ON WTT." + TRANSLATION_ID + " = T2." + TRANSLATION_ID +
+                " WHERE T1.WORD_TEXT=\"" + word.getName() +
+                "\" AND " + " T2.WORD_TEXT=\"" + translation.getName() + "\"";
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.rawQuery(query, null);
-        return cursor.getColumnCount() == 0;
+        return cursor.getColumnCount() != 0;
     }
 
     private long insertPair(WordModel wordModel, WordModel translationModel) {
