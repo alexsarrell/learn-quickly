@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">LearnQ</string>
+    <string name="forbidden_symbols">.\"/\']}{[:;\!@#$%^*</string>
     <string name="title_translation">Translation</string>
     <string name="title_word">Word</string>
     <string name="search_hint">Search</string>
@@ -13,6 +14,6 @@
     <string name="search_message">What do you want to do?</string>
     <string name="delete_button">Delete</string>
     <string name="apply_button">Apply</string>
-    <string name="cansel_button">Cansel</string>
+    <string name="cansel_button">Cancel</string>
     <string name="edit_button">Edit</string>
 </resources>
