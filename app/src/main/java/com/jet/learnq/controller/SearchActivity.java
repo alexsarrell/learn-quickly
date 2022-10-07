@@ -15,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.learnq1.R;
 import com.jet.learnq.ArrayOfWordsConverter;
-import com.jet.learnq.DialogView;
+import com.jet.learnq.JDialogView;
 import com.jet.learnq.ScrollViewBuilder;
 import com.jet.learnq.dto.WordDTO;
 import com.jet.learnq.model.Dictionary;
@@ -233,7 +233,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void setOnLongClickListener(TextView item) {
         item.setOnLongClickListener(listener -> {
-            DialogView onLongTouchBox = new DialogView(SearchActivity.this, dictionary, SearchActivity.this);
+            JDialogView onLongTouchBox = new JDialogView(SearchActivity.this, dictionary, SearchActivity.this);
             onLongTouchBox.show();
             onLongTouchBox.onDeleteClick(converter.getDTOsFromString(item.getText().toString().trim(), pairs),
                     preferences.getString("default_language_on", "Error"),

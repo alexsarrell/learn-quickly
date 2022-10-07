@@ -11,13 +11,13 @@ import com.jet.learnq.controller.SearchActivity;
 import com.jet.learnq.dto.WordDTO;
 import com.jet.learnq.model.Dictionary;
 
-public class DialogView extends Dialog {
+public class JDialogView extends Dialog {
     Button cansel;
     Button delete;
     Dictionary dictionary;
     SearchActivity activity;
 
-    public DialogView(@NonNull Context context, Dictionary dictionary, SearchActivity activity) {
+    public JDialogView(@NonNull Context context, Dictionary dictionary, SearchActivity activity) {
         super(context);
         this.dictionary = dictionary;
         this.activity = activity;

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         search = new Intent(MainActivity.this, SearchActivity.class);
         options = new Intent(MainActivity.this, OptionsActivity.class);
         SharedPreferences sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE);
-        getApplicationContext().deleteDatabase("dictionaries.db");
+        //getApplicationContext().deleteDatabase("dictionaries.db");
         if (("Light").equals(sharedPreferences.getString("current_theme", "Light"))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
@@ -49,10 +50,14 @@ public class MainActivity extends AppCompatActivity {
         currentLanguages = findViewById(R.id.activity_main_current_languages_textview);
         updateCurrentLanguages();
         addTextViewOnClickListener(currentLanguages);
-        addTheNewCouple.setOnClickListener(view -> {
+        setOnAddClickListener(addTheNewCouple);
+    }
+
+    private void setOnAddClickListener(View button) {
+        button.setOnClickListener(view -> {
             StringsValidator sv = new StringsValidator(getApplicationContext());
             Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.center_rotate);
-            addTheNewCouple.startAnimation(rotation);
+            button.startAnimation(rotation);
             String word = editTextWord.getText().toString();
             String translation = editTextTranslation.getText().toString();
             if (!preferences.getString("default_language_on", "empty").equals("empty")
