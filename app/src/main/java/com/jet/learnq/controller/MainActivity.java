@@ -14,11 +14,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import com.example.learnq1.R;
+import com.jet.learnq.Dictionary;
+import com.jet.learnq.SearchActivity;
 import com.jet.learnq.StringsValidator;
-import com.jet.learnq.model.Dictionary;
 
 public class MainActivity extends AppCompatActivity {
-    Dictionary dictionary;
+    com.jet.learnq.Dictionary dictionary;
     SharedPreferences preferences;
     SharedPreferences searchPreferences;
     ImageButton addTheNewCouple;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         search = new Intent(MainActivity.this, SearchActivity.class);
         options = new Intent(MainActivity.this, OptionsActivity.class);
+
         SharedPreferences sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE);
         //getApplicationContext().deleteDatabase("dictionaries.db");
         if (("Light").equals(sharedPreferences.getString("current_theme", "Light"))) {
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         editTextTranslation = findViewById(R.id.main_activity_editText_translation);
         dictionaryController = new SQLiteDatabaseController(MainActivity.this);
         dictionary = new Dictionary(dictionaryController, MainActivity.this);
+
     }
 
     public boolean onTouchEvent(MotionEvent touch) {

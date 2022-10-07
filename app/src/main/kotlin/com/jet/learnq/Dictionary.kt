@@ -6,6 +6,11 @@ import com.jet.learnq.controller.SQLiteDatabaseController
 import com.jet.learnq.dto.WordDTO
 import com.jet.learnq.model.LanguageModel
 import com.jet.learnq.model.WordModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import java.util.*
+import java.util.stream.Collectors
 
 class Dictionary(private val database: SQLiteDatabaseController, context: Context) {
     private var dictionary: MutableList<WordModel> = ArrayList()
@@ -19,8 +24,49 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
 
     init {
         preferences = context.getSharedPreferences("Properties", Context.MODE_PRIVATE)
+        reloadDictionary()
     }
 
+    suspend fun getSortedStringPairs(): ArrayList<ArrayList<String>> {
+        val dif = CoroutineScope(Dispatchers.Default).async {
+            var sortedWords = ArrayList<String>()
+            var sortedTranslations = ArrayList<String>()
+            val sortedStringPairs = ArrayList<ArrayList<String>>()
+            fillPairs(wordDTOS, sortedWords)
+            fillPairs(reversedWordDTOS, sortedTranslations)
+            sortedWords = sortedWords.stream().sorted().collect(Collectors.toList()) as ArrayList<String>
+            sortedTranslations = sortedTranslations.stream().sorted().collect(Collectors.toList()) as ArrayList<String>
+            sortedStringPairs.add(sortedWords)
+            sortedStringPairs.add(sortedTranslations)
+            return@async sortedStringPairs
+        }
+        return dif.await()
+    }
+
+    fun fillPairs(items: List<WordDTO>, stringItem: MutableList<String>) {
+        stringItem.clear()
+        for (wd: WordDTO in items) {
+            var contains = false
+            for (s: String in stringItem) {
+                contains = s.lowercase(Locale.getDefault()).startsWith(wd.name.lowercase(Locale.getDefault()))
+                if (contains) {
+                    break
+                }
+            }
+            if (!contains) {
+                val stringBuilder = StringBuilder(
+                    wd.name + " - " +
+                            wd.translations[0].name
+                )
+                if (wd.translations.size > 1) {
+                    for (i in 1 until wd.translations.size) {
+                        stringBuilder.append(", ").append(wd.translations[i].name)
+                    }
+                }
+                stringItem.add(stringBuilder.toString())
+            }
+        }
+    }
 
     fun deleteFromDatabase(
         toDeleteDTO: WordDTO,
@@ -53,7 +99,7 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
                     preferences.getString(
                         "default_language_on", "Error"
                     )
-                ), word, java.util.ArrayList()
+                ), word, ArrayList()
             ),
             WordModel(
                 1,
@@ -61,7 +107,7 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
                     preferences.getString(
                         "default_language_to", "Error"
                     )
-                ), translation, java.util.ArrayList()
+                ), translation, ArrayList()
             )
         )
         changed = true

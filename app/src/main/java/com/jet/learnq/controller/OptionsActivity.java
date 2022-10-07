@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.example.learnq1.R;
 import com.jet.learnq.ArrayOfWordsConverter;
 import com.jet.learnq.CoroutineRecord;
+import com.jet.learnq.MainActivity;
 import com.jet.learnq.model.Dictionary;
 import com.jet.learnq.model.PairDTO;
 
@@ -64,12 +65,12 @@ public class OptionsActivity extends AppCompatActivity {
             pasteArrayEditText.getText().clear();
         });
         buttonLanguage1.setOnClickListener(view -> {
-            Intent i = new Intent(OptionsActivity.this, SearchActivity.class);
+            Intent i = new Intent(OptionsActivity.this, com.jet.learnq.SearchActivity.class);
             i.putExtra("language", false);
             startActivity(i);
         });
         buttonLanguage2.setOnClickListener(view -> {
-            Intent i = new Intent(OptionsActivity.this, SearchActivity.class);
+            Intent i = new Intent(OptionsActivity.this, com.jet.learnq.SearchActivity.class);
             i.putExtra("language", true);
             startActivity(i);
         });
