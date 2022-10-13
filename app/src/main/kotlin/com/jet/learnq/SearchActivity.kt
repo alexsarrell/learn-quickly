@@ -1,5 +1,6 @@
 package com.jet.learnq
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Typeface
@@ -8,7 +9,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.MotionEvent
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +18,6 @@ import com.jet.learnq.controller.SQLiteDatabaseController
 import com.jet.learnq.dto.WordDTO
 import com.jet.learnq.model.LanguageModel
 import kotlinx.android.synthetic.main.approve_dialog_box.*
-import java.util.*
 import java.util.stream.Collectors
 import kotlin.math.abs
 
@@ -27,11 +26,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var preferences: SharedPreferences
     private var firstOrSecondLanguage = false
     private lateinit var scrollViewBuilder: ScrollViewBuilder
-    private lateinit var searchEditText: EditText
+    private lateinit var searchEditText: SearcherEditText
     private var isDictionary = false
     private lateinit var languagesList: LinearLayout
     private var extra: Bundle? = null
-    private lateinit var dictionary: Dictionary
     private var sortedWords: MutableList<String> = ArrayList()
     private var sortedTranslations: MutableList<String> = ArrayList()
     private lateinit var searchPreferences: SharedPreferences
@@ -55,9 +53,6 @@ class SearchActivity : AppCompatActivity() {
         extra = intent.extras
         preferences = getSharedPreferences("Properties", MODE_PRIVATE)
         scrollViewBuilder = ScrollViewBuilder(applicationContext)
-        dictionary = Dictionary(
-            SQLiteDatabaseController(applicationContext), applicationContext
-        )
         if (extra!!.getBoolean("lanOrPairs")) { //if true catch pairs if false catch languages
             dictionaryWindow()
         } else {
@@ -80,16 +75,19 @@ class SearchActivity : AppCompatActivity() {
         ) {
             sortedWords = extra!!.getStringArrayList("sorted_words")!!
             sortedTranslations = extra!!.getStringArrayList("sorted_translations")!!
+
+            pairs = Dictionary.getDictionary(preferences, SQLiteDatabaseController(this))
+            pairsTranslations = Dictionary.getReversedDictionary(preferences, SQLiteDatabaseController(this))
         } else {
             dictionaries()
             if (sortedWords.isEmpty()) {
-                linearLayout.removeAllViews()
+                if (linearLayout != null) linearLayout.removeAllViews()
             }
         }
         updateCurrentLanguages()
         if (sortedWords.isNotEmpty()) {
             typeface = resources.getFont(R.font.open_sans_medium_italic)
-            addTouchListener(sortedWords)
+            addSearchListener(sortedWords)
             fillItemsInList(sortedWords, languagesList, typeface)
             converter = ArrayOfWordsConverter()
         }
@@ -98,7 +96,7 @@ class SearchActivity : AppCompatActivity() {
     private fun languagesWindow() {
         isDictionary = false //languages
         firstOrSecondLanguage = extra!!.getBoolean("language", false)
-        var languageModels = dictionary.getLanguageModels()
+        var languageModels = Dictionary.getLanguageModels(SQLiteDatabaseController(this))
         languageModels = languageModels.stream()
             .sorted(Comparator.comparing { obj: LanguageModel -> obj.name })
             .collect(Collectors.toList())
@@ -106,19 +104,20 @@ class SearchActivity : AppCompatActivity() {
         for (lm: LanguageModel in languageModels) {
             display.add(lm.name)
         }
-        addTouchListener(display)
+        addSearchListener(display)
         typeface = resources.getFont(R.font.open_sans_medium_italic)
         fillItemsInList(display, languagesList, typeface)
     }
 
     private fun dictionaries() {
-        pairs = dictionary.getDictionary()
-        pairsTranslations = dictionary.getReversedDictionary()
+        pairs = Dictionary.getDictionary(preferences, SQLiteDatabaseController(this))
+        pairsTranslations = Dictionary.getReversedDictionary(preferences, SQLiteDatabaseController(this))
+
         if (pairs.isNotEmpty() && pairsTranslations.isNotEmpty()) {
             sortedWords = ArrayList()
             sortedTranslations = ArrayList()
-            dictionary.fillPairs(pairs, sortedWords)
-            dictionary.fillPairs(pairsTranslations, sortedTranslations)
+            Dictionary.fillPairs(pairs, sortedWords)
+            Dictionary.fillPairs(pairsTranslations, sortedTranslations)
             sortedWords = sortedWords.stream().sorted().collect(Collectors.toList())
             sortedTranslations = sortedTranslations.stream().sorted().collect(Collectors.toList())
         } else {
@@ -126,15 +125,16 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun <T : String?> addTouchListener(models: List<T>) {
+    private fun addSearchListener(names: List<String>) {
+        searchEditText.removeTextChangedListener(null)
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                //TODO сделай валидацию по текущему языку, можно передавать в дто язык элемента и проверять по нему
                 val writtenText = searchEditText.text.toString()
-                val filteredNames = models.stream()
-                    .filter { model: T ->
-                        model!!.startsWith(writtenText) ||
-                                model.lowercase(Locale.getDefault()).startsWith(writtenText)
+                val filteredNames = names.stream()
+                    .filter { model: String ->
+                        model.lowercase().startsWith(writtenText.lowercase())
                     }
                     .collect(Collectors.toList())
                 val typeface = resources.getFont(R.font.open_sans_medium_italic)
@@ -217,13 +217,25 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setOnLongClickListener(item: TextView) {
         item.setOnLongClickListener {
-            val onLongTouchBox = DialogView(this@SearchActivity, dictionary, this@SearchActivity)
-            onLongTouchBox.show()
-            onLongTouchBox.onDeleteClick(
-                converter.getDTOsFromString(item.text.toString().trim(), (pairs)),
-                preferences.getString("default_language_on", "Error"),
-                preferences.getString("default_language_to", "Error")
+            val onLongTouchBox = DialogView(
+                this@SearchActivity,
+                this@SearchActivity
             )
+            onLongTouchBox.show()
+            if (firstOrSecondLanguage) {
+                onLongTouchBox.onDeleteClick(
+                    converter.getDTOsFromString(item.text.toString().trim(), (pairsTranslations)),
+                    preferences.getString("default_language_on", "Error"),
+                    preferences.getString("default_language_to", "Error")
+                )
+            } else {
+                onLongTouchBox.onDeleteClick(
+                    converter.getDTOsFromString(item.text.toString().trim(), (pairsTranslations)),
+                    preferences.getString("default_language_on", "Error"),
+                    preferences.getString("default_language_to", "Error")
+                )
+            }
+
             false
         }
     }
@@ -245,6 +257,7 @@ class SearchActivity : AppCompatActivity() {
         if ((searchPreferences.getString("search_state", "Error") == "original")) {
             dictionaries()
             if (sortedTranslations.isNotEmpty()) {
+                addSearchListener(sortedTranslations)
                 fillItemsInList(sortedTranslations, languagesList, typeface)
             }
             editor.putString("search_state", "translation")
@@ -253,6 +266,7 @@ class SearchActivity : AppCompatActivity() {
             dictionaries()
             if (sortedWords.isNotEmpty()) {
                 fillItemsInList(sortedWords, languagesList, typeface)
+                addSearchListener(sortedWords)
             }
             editor.putString("search_state", "original")
             updateCurrentLanguages()
@@ -290,5 +304,11 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         return super.dispatchTouchEvent(motionEvent)
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, SearchActivity::class.java)
+        }
     }
 }

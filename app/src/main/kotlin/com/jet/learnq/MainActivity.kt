@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var dictionary: Dictionary
     private lateinit var preferences: SharedPreferences
     private lateinit var searchPreferences: SharedPreferences
     private lateinit var addTheNewCouple: ImageButton
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        search = Intent(this@MainActivity, SearchActivity::class.java)
+        search = SearchActivity.newIntent(this)
         options = Intent(this@MainActivity, OptionsActivity::class.java)
         val sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE)
         //getApplicationContext().deleteDatabase("dictionaries.db");
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                         && translation.replace("\\s".toRegex(), "").isNotEmpty()
                     ) {
                         if (sv.catchForbiddenString(word) && sv.catchForbiddenString(translation)) {
-                            dictionary.addANewPair(word, translation)
+                            Dictionary.addANewPair(word, translation, preferences, dictionaryController)
                             Toast.makeText(
                                 applicationContext, "The pair is successfully saved",
                                 Toast.LENGTH_SHORT
@@ -148,13 +147,14 @@ class MainActivity : AppCompatActivity() {
         editTextWord = findViewById(R.id.main_activity_editText_word)
         editTextTranslation = findViewById(R.id.main_activity_editText_translation)
         dictionaryController = SQLiteDatabaseController(this@MainActivity)
-        dictionary = Dictionary(dictionaryController, this@MainActivity)
+
 
         CoroutineScope(Dispatchers.Default).launch {
-            val sortedWords: List<String?> = dictionary.getSortedStringPairs()[0]
-            val sortedTranslations: List<String?> = dictionary.getSortedStringPairs()[1]
-            search.putStringArrayListExtra("sorted_words", sortedWords as ArrayList<String?>)
-            search.putStringArrayListExtra("sorted_translations", sortedTranslations as ArrayList<String?>)
+            val lists = Dictionary.getSortedStringPairs(preferences, dictionaryController)
+            val sortedWords = lists[0]
+            val sortedTranslations = lists[1]
+            search.putStringArrayListExtra("sorted_words", sortedWords)
+            search.putStringArrayListExtra("sorted_translations", sortedTranslations)
         }
     }
 

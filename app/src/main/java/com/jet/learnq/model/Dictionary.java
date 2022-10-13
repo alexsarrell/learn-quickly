@@ -6,11 +6,10 @@ import android.util.Log;
 import com.jet.learnq.controller.SQLiteDatabaseController;
 import com.jet.learnq.dto.WordDTO;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Dictionary implements Serializable {
+public class Dictionary {
     List<WordModel> dictionary;
     List<WordModel> reversedDictionary;
 
@@ -75,20 +74,22 @@ public class Dictionary implements Serializable {
     private void reloadDictionary() {
         changed = false;
         wordDTOS.clear();
+        String languageOn = preferences.getString("default_language_on", "English");
+        String languageTo = preferences.getString("default_language_to", "English");
         reversedWordDTOS.clear();
         pairs = database.getAllPairs(
-                preferences.getString("default_language_on", "English"),
-                preferences.getString("default_language_to", "English"));
+                languageOn,
+                languageTo);
         dictionary = pairs.get(0);
         Log.println(Log.INFO, "update", "dic size " + dictionary.size());
         reversedDictionary = pairs.get(1);
         Log.println(Log.INFO, "update", "r dic size " + reversedDictionary.size());
 
         for (WordModel wm : dictionary) {
-            wordDTOS.add(new WordDTO(wm.getTranslations(), wm.getName()));
+            wordDTOS.add(new WordDTO(wm.getTranslations(), wm.getName(), languageOn));
         }
         for (WordModel wm : reversedDictionary) {
-            reversedWordDTOS.add(new WordDTO(wm.getTranslations(), wm.getName()));
+            reversedWordDTOS.add(new WordDTO(wm.getTranslations(), wm.getName(), languageTo));
         }
     }
 }

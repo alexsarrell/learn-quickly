@@ -13,7 +13,6 @@ public class ApaSort {
     Integer[][] letterTracker;
     String[] words;*/
     HashMap<Integer, Integer> alphabetMap;
-
     public ApaSort(String[] alphabet) {
         this.alphabet = alphabet;
         alphabetMap = new HashMap<>();

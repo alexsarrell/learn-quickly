@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import com.example.learnq1.R;
-import com.jet.learnq.Dictionary;
 import com.jet.learnq.SearchActivity;
 import com.jet.learnq.StringsValidator;
 
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!word.replaceAll("\\s", "").isEmpty()
                             && !translation.replaceAll("\\s", "").isEmpty()) {
                         if (sv.catchForbiddenString(word) && sv.catchForbiddenString(translation)) {
-                            dictionary.addANewPair(word, translation);
+                            dictionary.addANewPair(word, translation, preferences, dictionaryController);
                             Toast.makeText(getApplicationContext(), "The pair is successfully saved",
                                     Toast.LENGTH_SHORT).show();
                         } else {
@@ -136,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
         editTextWord = findViewById(R.id.main_activity_editText_word);
         editTextTranslation = findViewById(R.id.main_activity_editText_translation);
         dictionaryController = new SQLiteDatabaseController(MainActivity.this);
-        dictionary = new Dictionary(dictionaryController, MainActivity.this);
-
     }
 
     public boolean onTouchEvent(MotionEvent touch) {
