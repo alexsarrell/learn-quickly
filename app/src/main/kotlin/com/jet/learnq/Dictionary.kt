@@ -6,21 +6,47 @@ import com.jet.learnq.controller.SQLiteDatabaseController
 import com.jet.learnq.dto.WordDTO
 import com.jet.learnq.model.LanguageModel
 import com.jet.learnq.model.WordModel
+import java.util.*
 
 class Dictionary(private val database: SQLiteDatabaseController, context: Context) {
     private var dictionary: MutableList<WordModel> = ArrayList()
     private var reversedDictionary: MutableList<WordModel> = ArrayList()
     private var wordDTOS: MutableList<WordDTO> = ArrayList()
     private var reversedWordDTOS: MutableList<WordDTO> = ArrayList()
-    private var languageModels: MutableList<LanguageModel> = database.allLanguages
+    private var languageModels: MutableList<LanguageModel> = ArrayList()
     private var pairs: MutableList<MutableList<WordModel>> = ArrayList()
     private var preferences: SharedPreferences
-    private var changed = false
+    private var changed = true
 
     init {
         preferences = context.getSharedPreferences("Properties", Context.MODE_PRIVATE)
+        languageModels = database.allLanguages
     }
 
+    fun fillPairs(items: List<WordDTO>, stringItem: MutableList<String>) {
+        stringItem.clear()
+        for (wd: WordDTO in items) {
+            var contains = false
+            for (s: String in stringItem) {
+                contains = s.lowercase(Locale.getDefault()).startsWith(wd.name.lowercase(Locale.getDefault()))
+                if (contains) {
+                    break
+                }
+            }
+            if (!contains) {
+                val stringBuilder = StringBuilder(
+                    wd.name + " - " +
+                            wd.translations[0].name
+                )
+                if (wd.translations.size > 1) {
+                    for (i in 1 until wd.translations.size) {
+                        stringBuilder.append(", ").append(wd.translations[i].name)
+                    }
+                }
+                stringItem.add(stringBuilder.toString())
+            }
+        }
+    }
 
     fun deleteFromDatabase(
         toDeleteDTO: WordDTO,
@@ -53,7 +79,7 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
                     preferences.getString(
                         "default_language_on", "Error"
                     )
-                ), word, java.util.ArrayList()
+                ), word, ArrayList()
             ),
             WordModel(
                 1,
@@ -61,27 +87,27 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
                     preferences.getString(
                         "default_language_to", "Error"
                     )
-                ), translation, java.util.ArrayList()
+                ), translation, ArrayList()
             )
         )
-        changed = true
     }
 
     private fun reloadDictionary() {
         changed = false
         wordDTOS.clear()
         reversedWordDTOS.clear()
+        val languageOn = preferences.getString("default_language_on", "English")
+        val languageTo = preferences.getString("default_language_to", "English")
         pairs = database.getAllPairs(
-            preferences.getString("default_language_on", "English"),
-            preferences.getString("default_language_to", "English")
+            languageOn, languageTo
         )
         dictionary = pairs[0]
         reversedDictionary = pairs[1]
         for (wm in dictionary) {
-            wordDTOS.add(WordDTO(wm.translations, wm.name))
+            wordDTOS.add(WordDTO(wm.translations, wm.name, languageOn))
         }
         for (wm in reversedDictionary) {
-            reversedWordDTOS.add(WordDTO(wm.translations, wm.name))
+            reversedWordDTOS.add(WordDTO(wm.translations, wm.name, languageTo))
         }
     }
 }

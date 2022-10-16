@@ -10,7 +10,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.LearnQ1">
         <activity
-                android:name="com.jet.learnq.controller.MainActivity"
+                android:name="com.jet.learnq.MainActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -21,7 +21,7 @@
         <activity android:name="com.jet.learnq.controller.OptionsActivity"
                   android:exported="true">
         </activity>
-        <activity android:name="com.jet.learnq.controller.SearchActivity"
+        <activity android:name="com.jet.learnq.SearchActivity"
                   android:exported="true">
         </activity>
     </application>

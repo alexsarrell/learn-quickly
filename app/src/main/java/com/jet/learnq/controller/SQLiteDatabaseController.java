@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import androidx.annotation.Nullable;
 import com.example.learnq1.R;
 import com.jet.learnq.dto.WordDTO;
@@ -113,19 +112,7 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
         SQLiteDatabase database = SQLiteDatabaseController.this.getReadableDatabase();
 
         Cursor c = database.rawQuery("SELECT * FROM WORD_TABLE", null);
-        if (c.moveToFirst()) {
-            do {
-                Log.println(Log.INFO, "WT", "WT + " + c.getString(1) + c.getInt(0));
-            }
-            while (c.moveToNext());
-        }
-        c = database.rawQuery("SELECT * FROM TRANSLATION_TABLE", null);
-        if (c.moveToFirst()) {
-            do {
-                Log.println(Log.INFO, "WT", "TT + " + c.getString(1) + c.getInt(0));
-            }
-            while (c.moveToNext());
-        }
+
 
         List<List<WordModel>> pairs = new ArrayList<>();
         Cursor cursor = getAllRelationsFromLinkTable(languageOn, languageTo, false);
@@ -356,7 +343,6 @@ public class SQLiteDatabaseController extends SQLiteOpenHelper {
                     db.execSQL(deleteQuery);
                     if (!deleted) {
                         for (WordModel wordModel : wordToDelete.getTranslations()) {
-                            Log.println(Log.INFO, "WM", "WORD MODEL " + wordModel.getName());
                             if (wordModel.getTranslations().size() == 1) { //удаляем из правой таблицы все переводы
                                 deleteQuery = "DELETE from "
                                         + TRANSLATION_TABLE_NAME

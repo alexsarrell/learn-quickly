@@ -40,7 +40,7 @@
                       android:divider="@drawable/divider"
                       android:orientation="vertical" android:id="@+id/search_language_scroll_layout"/>
     </ScrollView>
-    <EditText
+    <com.jet.learnq.SearcherEditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.learnq1.R;
 import com.jet.learnq.ArrayOfWordsConverter;
-import com.jet.learnq.DialogView;
+import com.jet.learnq.JDialogView;
 import com.jet.learnq.ScrollViewBuilder;
 import com.jet.learnq.dto.WordDTO;
 import com.jet.learnq.model.Dictionary;
@@ -57,9 +57,6 @@ public class SearchActivity extends AppCompatActivity {
         extra = getIntent().getExtras();
         preferences = getSharedPreferences("Properties", MODE_PRIVATE);
         scrollViewBuilder = new ScrollViewBuilder(getApplicationContext());
-
-        converter = new ArrayOfWordsConverter();
-
         dictionary = new Dictionary(
                 new SQLiteDatabaseController(SearchActivity.this), SearchActivity.this);
 
@@ -84,9 +81,11 @@ public class SearchActivity extends AppCompatActivity {
         updateCurrentLanguages();
         getDictionaries();
         if (sortedWords != null && !sortedWords.isEmpty()) {
+            //addTouchListener(sortedWords);
             typeface = getResources().getFont(R.font.open_sans_medium_italic);
             addTouchListener(sortedWords);
             fillItemsInList(sortedWords, languagesList, typeface);
+            converter = new ArrayOfWordsConverter();
         }
     }
 
@@ -118,8 +117,8 @@ public class SearchActivity extends AppCompatActivity {
             sortedWords = new ArrayList<>();
             sortedTranslations = new ArrayList<>();
 
-            converter.fillPairs(pairs, sortedWords);
-            converter.fillPairs(pairsTranslations, sortedTranslations);
+            fillPairs(pairs, sortedWords);
+            fillPairs(pairsTranslations, sortedTranslations);
             sortedWords = sortedWords.stream().sorted().collect(Collectors.toList());
             sortedTranslations = sortedTranslations.stream().sorted().collect(Collectors.toList());
         } else {
@@ -127,7 +126,28 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-
+    private void fillPairs(List<WordDTO> items, List<String> stringItem) {
+        stringItem.clear();
+        for (WordDTO wd : items) {
+            boolean contains = false;
+            for (String s : stringItem) {
+                contains = s.toLowerCase().startsWith(wd.getName().toLowerCase());
+                if (contains) {
+                    break;
+                }
+            }
+            if (!contains) {
+                StringBuilder stringBuilder = new StringBuilder(wd.getName() + " - " +
+                        wd.getTranslations().get(0).getName());
+                if (wd.getTranslations().size() > 1) {
+                    for (int i = 1; i < wd.getTranslations().size(); i++) {
+                        stringBuilder.append(", ").append(wd.getTranslations().get(i).getName());
+                    }
+                }
+                stringItem.add(stringBuilder.toString());
+            }
+        }
+    }
 
     private <T extends String> void addTouchListener(List<T> models) {
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -175,6 +195,7 @@ public class SearchActivity extends AppCompatActivity {
         scrollViewBuilder.strokeDiv(languagesList, (R.drawable.ic_line_divider),
                 0, 0, 200, -40);
         for (T lm : languageModels) {
+
             if (firstLetter != lm.charAt(0)) {
                 firstLetter = lm.charAt(0);
                 scrollViewBuilder.strokeDiv(languagesList, (R.drawable.small_divider));
@@ -212,7 +233,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void setOnLongClickListener(TextView item) {
         item.setOnLongClickListener(listener -> {
-            DialogView onLongTouchBox = new DialogView(SearchActivity.this, dictionary, SearchActivity.this);
+            JDialogView onLongTouchBox = new JDialogView(SearchActivity.this, dictionary, SearchActivity.this);
             onLongTouchBox.show();
             onLongTouchBox.onDeleteClick(converter.getDTOsFromString(item.getText().toString().trim(), pairs),
                     preferences.getString("default_language_on", "Error"),
@@ -223,7 +244,30 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-
+    /*private WordDTO getDTOsFromString(String text, List<WordDTO> pairs){
+        StringBuilder sb = new StringBuilder();
+        Iterator<Integer> iterator = text.chars().iterator();
+        while(iterator.hasNext()){
+            char ch = (char)(int)iterator.next();
+            if(ch != '-'){
+                sb.append((char)(int)ch);
+            }
+            else{
+                sb.deleteCharAt(sb.length() - 1);
+                break;
+            }
+        }
+        Log.println(Log.INFO, "message", "what word " +
+                sb);
+        WordDTO wordToDelete = pairs.get(0);
+        for(WordDTO wd : pairs){
+            if(wd.getName().equals(sb.toString())){
+                wordToDelete = wd;
+                break;
+            }
+        }
+        return wordToDelete;
+    }*/
     private void addTextViewOnClickListener(TextView textView) {
         textView.setOnClickListener(view -> {
             mirrorPairs();
@@ -237,7 +281,6 @@ public class SearchActivity extends AppCompatActivity {
         editor.putString("default_language_on", preferences.getString("default_language_to", "Error"));
         editor.putString("default_language_to", languageOn);
         editor.apply();
-
         searchPreferences = getSharedPreferences("Pairs_properties", MODE_PRIVATE);
         editor = searchPreferences.edit();
         if (searchPreferences.getString("search_state", "Error").equals("original")) {
@@ -289,49 +332,3 @@ public class SearchActivity extends AppCompatActivity {
         return super.dispatchTouchEvent(motionEvent);
     }
 }
-  /*private void fillPairs(List<WordDTO> items, List<String> stringItem) {
-        stringItem.clear();
-        for (WordDTO wd : items) {
-            boolean contains = false;
-            for (String s : stringItem) {
-                contains = s.toLowerCase().startsWith(wd.getName().toLowerCase());
-                if (contains) {
-                    break;
-                }
-            }
-            if (!contains) {
-                StringBuilder stringBuilder = new StringBuilder(wd.getName() + " - " +
-                        wd.getTranslations().get(0).getName());
-                if (wd.getTranslations().size() > 1) {
-                    for (int i = 1; i < wd.getTranslations().size(); i++) {
-                        stringBuilder.append(", ").append(wd.getTranslations().get(i).getName());
-                    }
-                }
-                stringItem.add(stringBuilder.toString());
-            }
-        }
-    }*/
- /*private WordDTO getDTOsFromString(String text, List<WordDTO> pairs){
-        StringBuilder sb = new StringBuilder();
-        Iterator<Integer> iterator = text.chars().iterator();
-        while(iterator.hasNext()){
-            char ch = (char)(int)iterator.next();
-            if(ch != '-'){
-                sb.append((char)(int)ch);
-            }
-            else{
-                sb.deleteCharAt(sb.length() - 1);
-                break;
-            }
-        }
-        Log.println(Log.INFO, "message", "what word " +
-                sb);
-        WordDTO wordToDelete = pairs.get(0);
-        for(WordDTO wd : pairs){
-            if(wd.getName().equals(sb.toString())){
-                wordToDelete = wd;
-                break;
-            }
-        }
-        return wordToDelete;
-    }*/
