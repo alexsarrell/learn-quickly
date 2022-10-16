@@ -74,19 +74,9 @@ class SearchActivity : AppCompatActivity() {
 
     private fun dictionaryWindow() {
         isDictionary = true //dictionary
-        if (extra!!.getStringArrayList("sorted_words") != null
-            && extra!!.getStringArrayList("sorted_translations") != null
-        ) {
-            sortedWords = extra!!.getStringArrayList("sorted_words")!!
-            sortedTranslations = extra!!.getStringArrayList("sorted_translations")!!
-
-            pairs = dictionary.getDictionary()
-            pairsTranslations = dictionary.getReversedDictionary()
-        } else {
-            dictionaries()
-            if (sortedWords.isEmpty()) {
-                if (linearLayout != null) linearLayout.removeAllViews()
-            }
+        dictionaries()
+        if (sortedWords.isEmpty()) {
+            if (linearLayout != null) linearLayout.removeAllViews()
         }
         updateCurrentLanguages()
         if (sortedWords.isNotEmpty()) {

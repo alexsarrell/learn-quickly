@@ -20,6 +20,7 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
 
     init {
         preferences = context.getSharedPreferences("Properties", Context.MODE_PRIVATE)
+        languageModels = database.allLanguages
     }
 
     fun fillPairs(items: List<WordDTO>, stringItem: MutableList<String>) {
