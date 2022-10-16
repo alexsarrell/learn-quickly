@@ -29,6 +29,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchEditText: SearcherEditText
     private var isDictionary = false
     private lateinit var languagesList: LinearLayout
+    private lateinit var dictionary: Dictionary
     private var extra: Bundle? = null
     private var sortedWords: MutableList<String> = ArrayList()
     private var sortedTranslations: MutableList<String> = ArrayList()
@@ -47,6 +48,9 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         searchEditText = findViewById(R.id.search_language_search_edit_text)
         languagesList = findViewById(R.id.search_language_scroll_layout)
+        languagesList.removeAllViews()
+        //TODO если менять язык обособленно от search activity, то он не перезагружает его
+        dictionary = Dictionary(SQLiteDatabaseController(this), applicationContext)
         currentLanguagesTextView = findViewById(R.id.activity_search_current_languages_textview)
         addTextViewOnClickListener(currentLanguagesTextView)
         typeface = resources.getFont(R.font.open_sans_medium_italic)
@@ -76,8 +80,8 @@ class SearchActivity : AppCompatActivity() {
             sortedWords = extra!!.getStringArrayList("sorted_words")!!
             sortedTranslations = extra!!.getStringArrayList("sorted_translations")!!
 
-            pairs = Dictionary.getDictionary(preferences, SQLiteDatabaseController(this))
-            pairsTranslations = Dictionary.getReversedDictionary(preferences, SQLiteDatabaseController(this))
+            pairs = dictionary.getDictionary()
+            pairsTranslations = dictionary.getReversedDictionary()
         } else {
             dictionaries()
             if (sortedWords.isEmpty()) {
@@ -96,7 +100,7 @@ class SearchActivity : AppCompatActivity() {
     private fun languagesWindow() {
         isDictionary = false //languages
         firstOrSecondLanguage = extra!!.getBoolean("language", false)
-        var languageModels = Dictionary.getLanguageModels(SQLiteDatabaseController(this))
+        var languageModels = dictionary.getLanguageModels()
         languageModels = languageModels.stream()
             .sorted(Comparator.comparing { obj: LanguageModel -> obj.name })
             .collect(Collectors.toList())
@@ -110,14 +114,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun dictionaries() {
-        pairs = Dictionary.getDictionary(preferences, SQLiteDatabaseController(this))
-        pairsTranslations = Dictionary.getReversedDictionary(preferences, SQLiteDatabaseController(this))
+        pairs = dictionary.getDictionary()
+        pairsTranslations = dictionary.getReversedDictionary()
 
         if (pairs.isNotEmpty() && pairsTranslations.isNotEmpty()) {
             sortedWords = ArrayList()
             sortedTranslations = ArrayList()
-            Dictionary.fillPairs(pairs, sortedWords)
-            Dictionary.fillPairs(pairsTranslations, sortedTranslations)
+            dictionary.fillPairs(pairs, sortedWords)
+            dictionary.fillPairs(pairsTranslations, sortedTranslations)
             sortedWords = sortedWords.stream().sorted().collect(Collectors.toList())
             sortedTranslations = sortedTranslations.stream().sorted().collect(Collectors.toList())
         } else {
@@ -226,13 +230,15 @@ class SearchActivity : AppCompatActivity() {
                 onLongTouchBox.onDeleteClick(
                     converter.getDTOsFromString(item.text.toString().trim(), (pairsTranslations)),
                     preferences.getString("default_language_on", "Error"),
-                    preferences.getString("default_language_to", "Error")
+                    preferences.getString("default_language_to", "Error"),
+                    dictionary
                 )
             } else {
                 onLongTouchBox.onDeleteClick(
                     converter.getDTOsFromString(item.text.toString().trim(), (pairsTranslations)),
                     preferences.getString("default_language_on", "Error"),
-                    preferences.getString("default_language_to", "Error")
+                    preferences.getString("default_language_to", "Error"),
+                    dictionary
                 )
             }
 
@@ -289,7 +295,7 @@ class SearchActivity : AppCompatActivity() {
                                 && abs(y1 - y2)
                                 < (applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10))
                     ) {
-                        val i = Intent(this@SearchActivity, com.jet.learnq.MainActivity::class.java)
+                        val i = Intent(this@SearchActivity, MainActivity::class.java)
                         startActivity(i)
                         overridePendingTransition(R.anim.slide_on_right, R.anim.slide_out_right)
                     }

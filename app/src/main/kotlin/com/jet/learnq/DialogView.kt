@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Window
 import android.widget.Button
 import com.example.learnq1.R
-import com.jet.learnq.controller.SQLiteDatabaseController
 import com.jet.learnq.dto.WordDTO
 
 class DialogView(
@@ -27,13 +26,11 @@ class DialogView(
         setCancelable(false)
     }
 
-    fun onDeleteClick(wordDTO: WordDTO, languageOn: String?, languageTo: String?) {
+    fun onDeleteClick(wordDTO: WordDTO, languageOn: String?, languageTo: String?, dictionary: Dictionary) {
         delete.setOnClickListener {
             if (languageOn != null && languageTo != null) {
-                Dictionary.deleteFromDatabase(
-                    wordDTO, languageOn, languageTo,
-                    activity.getSharedPreferences("preferences", 0),
-                    SQLiteDatabaseController(activity)
+                dictionary.deleteFromDatabase(
+                    wordDTO, languageOn, languageTo
                 )
             }
             activity.update()

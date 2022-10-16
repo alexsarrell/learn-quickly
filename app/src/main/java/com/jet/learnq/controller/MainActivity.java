@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!word.replaceAll("\\s", "").isEmpty()
                             && !translation.replaceAll("\\s", "").isEmpty()) {
                         if (sv.catchForbiddenString(word) && sv.catchForbiddenString(translation)) {
-                            dictionary.addANewPair(word, translation, preferences, dictionaryController);
+                            dictionary.addANewPair(word, translation);
                             Toast.makeText(getApplicationContext(), "The pair is successfully saved",
                                     Toast.LENGTH_SHORT).show();
                         } else {

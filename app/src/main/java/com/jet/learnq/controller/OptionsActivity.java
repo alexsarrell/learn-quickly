@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.example.learnq1.R;
 import com.jet.learnq.ArrayOfWordsConverter;
 import com.jet.learnq.CoroutineRecord;
+import com.jet.learnq.Dictionary;
 import com.jet.learnq.MainActivity;
 import com.jet.learnq.model.PairDTO;
 
@@ -57,8 +58,8 @@ public class OptionsActivity extends AppCompatActivity {
             List<PairDTO> pairs = converter.getWordDTOsFromStringArray(
                     Arrays.stream(str.split("\n")).collect(Collectors.toList()));
             CoroutineRecord coroutineRecord = new CoroutineRecord();
-            coroutineRecord.addAllPairs(pairs, preferences,
-                    new SQLiteDatabaseController(getApplicationContext()));
+            coroutineRecord.addAllPairs(pairs, new Dictionary(new SQLiteDatabaseController(this),
+                    getApplicationContext()));
             pasteArrayEditText.getText().clear();
         });
         buttonLanguage1.setOnClickListener(view -> {

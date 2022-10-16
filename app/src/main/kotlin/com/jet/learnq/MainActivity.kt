@@ -15,9 +15,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.learnq1.R
 import com.jet.learnq.controller.OptionsActivity
 import com.jet.learnq.controller.SQLiteDatabaseController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var editTextWord: EditText
     private lateinit var editTextTranslation: EditText
     private lateinit var currentLanguages: TextView
+    private lateinit var dictionary: Dictionary
     private lateinit var dictionaryController: SQLiteDatabaseController
     private lateinit var search: Intent
     private lateinit var options: Intent
@@ -41,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         search = SearchActivity.newIntent(this)
         options = Intent(this@MainActivity, OptionsActivity::class.java)
+
         val sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE)
         //getApplicationContext().deleteDatabase("dictionaries.db");
         if ("Light" == sharedPreferences.getString("current_theme", "Light")) {
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                         && translation.replace("\\s".toRegex(), "").isNotEmpty()
                     ) {
                         if (sv.catchForbiddenString(word) && sv.catchForbiddenString(translation)) {
-                            Dictionary.addANewPair(word, translation, preferences, dictionaryController)
+                            dictionary.addANewPair(word, translation)
                             Toast.makeText(
                                 applicationContext, "The pair is successfully saved",
                                 Toast.LENGTH_SHORT
@@ -115,7 +114,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mirrorLanguages() {
-        val language = preferences.getString("default_language_on", "Choose a language")
+        val language = preferences.getString("default_language_on", "Choose a language").toString()
         val editor = preferences.edit()
         editor.putString(
             "default_language_on",
@@ -123,6 +122,16 @@ class MainActivity : AppCompatActivity() {
         )
         editor.putString("default_language_to", language)
         editor.apply()
+        searchPreferences = getSharedPreferences("Pairs_properties", MODE_PRIVATE)
+        val searchEditor = searchPreferences.edit()
+        if ((searchPreferences.getString("search_state", "Error") == "original")) {
+            searchEditor.putString("search_state", "translation")
+            updateCurrentLanguages()
+        } else if ((searchPreferences.getString("search_state", "Error") == "translation")) {
+            searchEditor.putString("search_state", "original")
+            updateCurrentLanguages()
+        }
+        searchEditor.apply()
     }
 
     private fun addTextViewOnClickListener(textView: TextView?) {
@@ -133,6 +142,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 mirrorLanguages()
                 updateCurrentLanguages()
+                search.putStringArrayListExtra("sorted_words", null)
+                search.putStringArrayListExtra("sorted_translations", null)
             }
         }
     }
@@ -147,15 +158,15 @@ class MainActivity : AppCompatActivity() {
         editTextWord = findViewById(R.id.main_activity_editText_word)
         editTextTranslation = findViewById(R.id.main_activity_editText_translation)
         dictionaryController = SQLiteDatabaseController(this@MainActivity)
+        dictionary = Dictionary(dictionaryController, applicationContext)
 
-
-        CoroutineScope(Dispatchers.Default).launch {
+        /*CoroutineScope(Dispatchers.Default).launch {
             val lists = Dictionary.getSortedStringPairs(preferences, dictionaryController)
             val sortedWords = lists[0]
             val sortedTranslations = lists[1]
             search.putStringArrayListExtra("sorted_words", sortedWords)
             search.putStringArrayListExtra("sorted_translations", sortedTranslations)
-        }
+        }*/
     }
 
     override fun onTouchEvent(touch: MotionEvent): Boolean {
