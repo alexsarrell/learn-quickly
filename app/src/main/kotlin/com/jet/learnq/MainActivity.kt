@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         options = Intent(this@MainActivity, OptionsActivity::class.java)
 
         val sharedPreferences = getSharedPreferences("current_theme", MODE_PRIVATE)
-        //getApplicationContext().deleteDatabase("dictionaries.db");
+        // getApplicationContext().deleteDatabase("dictionaries.db");
         if ("Light" == sharedPreferences.getString("current_theme", "Light")) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         } else {
@@ -61,22 +61,24 @@ class MainActivity : AppCompatActivity() {
             button.startAnimation(rotation)
             val word = editTextWord.text.toString()
             val translation = editTextTranslation.text.toString()
-            if (preferences.getString("default_language_on", "empty") != "empty"
-                && preferences.getString("default_language_to", "empty") != "empty"
+            if (preferences.getString("default_language_on", "empty") != "empty" &&
+                preferences.getString("default_language_to", "empty") != "empty"
             ) {
                 if (word.isNotEmpty() && translation.isNotEmpty()) {
-                    if (word.replace("\\s".toRegex(), "").isNotEmpty()
-                        && translation.replace("\\s".toRegex(), "").isNotEmpty()
+                    if (word.replace("\\s".toRegex(), "").isNotEmpty() &&
+                        translation.replace("\\s".toRegex(), "").isNotEmpty()
                     ) {
                         if (sv.catchForbiddenString(word) && sv.catchForbiddenString(translation)) {
                             dictionary.addANewPair(word, translation)
                             Toast.makeText(
-                                applicationContext, "The pair is successfully saved",
+                                applicationContext,
+                                "The pair is successfully saved",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
                             Toast.makeText(
-                                applicationContext, "You used a forbidden symbol or the word is too long",
+                                applicationContext,
+                                "You used a forbidden symbol or the word is too long",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -84,19 +86,22 @@ class MainActivity : AppCompatActivity() {
                         editTextTranslation.setText("")
                     } else {
                         Toast.makeText(
-                            applicationContext, "You can't save a whitespace word",
+                            applicationContext,
+                            "You can't save a whitespace word",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 } else {
                     Toast.makeText(
-                        applicationContext, "You can't save an empty word",
+                        applicationContext,
+                        "You can't save an empty word",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             } else {
                 Toast.makeText(
-                    applicationContext, "Choose languages at first",
+                    applicationContext,
+                    "Choose languages at first",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -122,16 +127,7 @@ class MainActivity : AppCompatActivity() {
         )
         editor.putString("default_language_to", language)
         editor.apply()
-        searchPreferences = getSharedPreferences("Pairs_properties", MODE_PRIVATE)
-        val searchEditor = searchPreferences.edit()
-        if ((searchPreferences.getString("search_state", "Error") == "original")) {
-            searchEditor.putString("search_state", "translation")
-            updateCurrentLanguages()
-        } else if ((searchPreferences.getString("search_state", "Error") == "translation")) {
-            searchEditor.putString("search_state", "original")
-            updateCurrentLanguages()
-        }
-        searchEditor.apply()
+        updateCurrentLanguages()
     }
 
     private fun addTextViewOnClickListener(textView: TextView?) {
@@ -178,14 +174,14 @@ class MainActivity : AppCompatActivity() {
             MotionEvent.ACTION_UP -> {
                 x2 = touch.x
                 y2 = touch.y
-                if (y2 - y1 > applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10
-                    && abs(x1 - x2) < applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10
+                if (y2 - y1 > applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10 &&
+                    abs(x1 - x2) < applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10
                 ) {
                     startActivity(options)
                     overridePendingTransition(R.anim.slide_on_top, R.anim.slide_out_top)
                 }
-                if (x2 - x1 > applicationContext.resources.displayMetrics.widthPixels.toFloat() / 10
-                    && abs(y1 - y2) < applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10
+                if (x2 - x1 > applicationContext.resources.displayMetrics.widthPixels.toFloat() / 10 &&
+                    abs(y1 - y2) < applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10
                 ) {
                     search.putExtra("lanOrPairs", true)
                     startActivity(search)

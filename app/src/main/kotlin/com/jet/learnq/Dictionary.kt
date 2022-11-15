@@ -20,7 +20,7 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
 
     init {
         preferences = context.getSharedPreferences("Properties", Context.MODE_PRIVATE)
-        languageModels = database.allLanguages
+        languageModels = database.allLanguages // TODO сделать его обратно синглтоном
     }
 
     fun fillPairs(items: List<WordDTO>, stringItem: MutableList<String>) {
@@ -36,7 +36,7 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
             if (!contains) {
                 val stringBuilder = StringBuilder(
                     wd.name + " - " +
-                            wd.translations[0].name
+                        wd.translations[0].name
                 )
                 if (wd.translations.size > 1) {
                     for (i in 1 until wd.translations.size) {
@@ -77,17 +77,23 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
                 1,
                 database.getLanguageId(
                     preferences.getString(
-                        "default_language_on", "Error"
+                        "default_language_on",
+                        "Error"
                     )
-                ), word, ArrayList()
+                ),
+                word,
+                ArrayList()
             ),
             WordModel(
                 1,
                 database.getLanguageId(
                     preferences.getString(
-                        "default_language_to", "Error"
+                        "default_language_to",
+                        "Error"
                     )
-                ), translation, ArrayList()
+                ),
+                translation,
+                ArrayList()
             )
         )
     }
@@ -99,7 +105,8 @@ class Dictionary(private val database: SQLiteDatabaseController, context: Contex
         val languageOn = preferences.getString("default_language_on", "English")
         val languageTo = preferences.getString("default_language_to", "English")
         pairs = database.getAllPairs(
-            languageOn, languageTo
+            languageOn,
+            languageTo
         )
         dictionary = pairs[0]
         reversedDictionary = pairs[1]

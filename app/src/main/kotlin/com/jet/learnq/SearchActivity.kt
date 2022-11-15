@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.approve_dialog_box.*
 import java.util.stream.Collectors
 import kotlin.math.abs
 
-
 class SearchActivity : AppCompatActivity() {
     private lateinit var preferences: SharedPreferences
     private var firstOrSecondLanguage = false
@@ -49,7 +48,7 @@ class SearchActivity : AppCompatActivity() {
         searchEditText = findViewById(R.id.search_language_search_edit_text)
         languagesList = findViewById(R.id.search_language_scroll_layout)
         languagesList.removeAllViews()
-        //TODO если менять язык обособленно от search activity, то он не перезагружает его
+        // TODO если менять язык обособленно от search activity, то он не перезагружает его
         dictionary = Dictionary(SQLiteDatabaseController(this), applicationContext)
         currentLanguagesTextView = findViewById(R.id.activity_search_current_languages_textview)
         addTextViewOnClickListener(currentLanguagesTextView)
@@ -57,7 +56,7 @@ class SearchActivity : AppCompatActivity() {
         extra = intent.extras
         preferences = getSharedPreferences("Properties", MODE_PRIVATE)
         scrollViewBuilder = ScrollViewBuilder(applicationContext)
-        if (extra!!.getBoolean("lanOrPairs")) { //if true catch pairs if false catch languages
+        if (extra!!.getBoolean("lanOrPairs")) { // if true catch pairs if false catch languages
             dictionaryWindow()
         } else {
             languagesWindow()
@@ -73,7 +72,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun dictionaryWindow() {
-        isDictionary = true //dictionary
+        isDictionary = true // dictionary
         dictionaries()
         if (sortedWords.isEmpty()) {
             if (linearLayout != null) linearLayout.removeAllViews()
@@ -88,7 +87,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun languagesWindow() {
-        isDictionary = false //languages
+        isDictionary = false // languages
         firstOrSecondLanguage = extra!!.getBoolean("language", false)
         var languageModels = dictionary.getLanguageModels()
         languageModels = languageModels.stream()
@@ -124,7 +123,7 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                //TODO сделай валидацию по текущему языку, можно передавать в дто язык элемента и проверять по нему
+                // TODO сделай валидацию по текущему языку, можно передавать в дто язык элемента и проверять по нему
                 val writtenText = searchEditText.text.toString()
                 val filteredNames = names.stream()
                     .filter { model: String ->
@@ -143,7 +142,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     fun update() {
-        if (extra!!.getBoolean("lanOrPairs")) { //if true catch pairs if false catch languages
+        if (extra!!.getBoolean("lanOrPairs")) { // if true catch pairs if false catch languages
             sortedWords.clear()
             sortedTranslations.clear()
             dictionaryWindow()
@@ -161,8 +160,12 @@ class SearchActivity : AppCompatActivity() {
             )
         )
         scrollViewBuilder.strokeDiv(
-            linearLayout, (R.drawable.ic_line_divider),
-            0, 0, 200, -40
+            linearLayout,
+            (R.drawable.ic_line_divider),
+            0,
+            0,
+            200,
+            -40
         )
         for (lm: String in itemsText) {
             if (firstLetter != lm[0]) {
@@ -170,13 +173,18 @@ class SearchActivity : AppCompatActivity() {
                 scrollViewBuilder.strokeDiv(linearLayout, (R.drawable.small_divider))
                 linearLayout.addView(
                     scrollViewBuilder.setFirstLetter(
-                        firstLetter, font,
+                        firstLetter,
+                        font,
                         getColor(R.color.text_labels_color)
                     )
                 )
                 scrollViewBuilder.strokeDiv(
-                    linearLayout, (R.drawable.ic_line_divider),
-                    0, 0, 200, -40
+                    linearLayout,
+                    (R.drawable.ic_line_divider),
+                    0,
+                    0,
+                    200,
+                    -40
                 )
             }
             val item = TextView(applicationContext)
@@ -280,19 +288,23 @@ class SearchActivity : AppCompatActivity() {
                 MotionEvent.ACTION_UP -> {
                     x2 = motionEvent.x
                     y2 = motionEvent.y
-                    if ((x1 - x2
-                                > (applicationContext.resources.displayMetrics.widthPixels.toFloat() / 10)
-                                && abs(y1 - y2)
-                                < (applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10))
+                    if ((
+                        x1 - x2
+                        > (applicationContext.resources.displayMetrics.widthPixels.toFloat() / 10) &&
+                            abs(y1 - y2)
+                                < (applicationContext.resources.displayMetrics.heightPixels.toFloat() / 10)
+                        )
                     ) {
                         val i = Intent(this@SearchActivity, MainActivity::class.java)
                         startActivity(i)
                         overridePendingTransition(R.anim.slide_on_right, R.anim.slide_out_right)
                     }
-                    if ((x2 - x1
-                                > (applicationContext.resources.displayMetrics.widthPixels.toFloat() / 10)
-                                && abs(y1 - y2)
-                                < (applicationContext.resources.displayMetrics.heightPixels.toFloat() / 20))
+                    if ((
+                        x2 - x1
+                        > (applicationContext.resources.displayMetrics.widthPixels.toFloat() / 10) &&
+                            abs(y1 - y2)
+                                < (applicationContext.resources.displayMetrics.heightPixels.toFloat() / 20)
+                        )
                     ) {
                         mirrorPairs()
                     }
